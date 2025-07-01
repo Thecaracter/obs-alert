@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id" class="bg-transparent">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBS Alert Overlay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <style>
+        /* Force complete transparency for OBS */
+        html,
+        body {
+            background: transparent !important;
+            background-color: transparent !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Remove all default backgrounds, borders, shadows */
+        *,
+        *::before,
+        *::after {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        /* Only alert container can have background and styling */
+        .alert-container {
+            background-color: initial !important;
+            border: initial !important;
+            box-shadow: initial !important;
+        }
+
+        /* Animation keyframes */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .slide-in {
+            animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .slide-out {
+            animation: slideOutRight 0.3s ease-in-out;
+        }
+
+        /* Alert type gradients - ONLY for alert containers */
+        .bg-donation {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+
+        .bg-follow {
+            background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%) !important;
+        }
+
+        .bg-subscribe {
+            background: linear-gradient(135deg, #FF5722 0%, #FF8A65 100%) !important;
+        }
+
+        .bg-superchat {
+            background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%) !important;
+        }
+
+        .bg-tiktok {
+            background: linear-gradient(135deg, #ff0050 0%, #ff4081 100%) !important;
+        }
+
+        /* Hide by default */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Remove ALL shadows and borders from Tailwind classes */
+        .shadow-2xl {
+            box-shadow: none !important;
+        }
+
+        .border-2,
+        .border-b-2 {
+            border: none !important;
+        }
+
+        .drop-shadow-lg {
+            filter: none !important;
+        }
+
+        .backdrop-blur-sm {
+            backdrop-filter: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-transparent w-screen h-screen overflow-hidden m-0 p-0 font-sans">
+    <!-- ONLY Alert Container - Completely clean, no shadows/borders -->
+    <div id="alertContainer"
+        class="alert-container fixed top-4 right-4 w-96 min-h-32 bg-donation rounded-2xl z-50 hidden">
+
+        <!-- Alert Header - Clean, no borders -->
+        <div class="alert-container bg-white/15 px-5 py-3 rounded-t-2xl flex justify-between items-center">
+            <span id="alertType" class="text-sm font-bold text-white/90 uppercase tracking-wider">DONASI</span>
+            <span id="platformBadge"
+                class="alert-container bg-white/20 px-2 py-1 rounded-xl text-xs font-bold text-white">API</span>
+        </div>
+
+        <!-- Alert Body - Clean, no shadows -->
+        <div class="alert-container p-5 text-white">
+            <div id="donorName" class="text-xl font-bold mb-2 break-words">Nama Donor</div>
+            <div id="donationAmount" class="text-2xl font-bold text-yellow-400 mb-3">Rp 50,000</div>
+            <div id="donationMessage"
+                class="text-sm leading-relaxed text-white/95 italic max-h-16 overflow-hidden break-words">
+                Terima kasih untuk support nya!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class OBSAlertOverlay {
+            constructor() {
+                this.socket = null;
+                this.currentAlert = null;
+                this.alertQueue = [];
+                this.isConnected = false;
+                this.alertTimeout = null;
+
+                this.elements = {
+                    alertContainer: document.getElementById('alertContainer'),
+                    alertType: document.getElementById('alertType'),
+                    platformBadge: document.getElementById('platformBadge'),
+                    donorName: document.getElementById('donorName'),
+                    donationAmount: document.getElementById('donationAmount'),
+                    donationMessage: document.getElementById('donationMessage')
+                };
+
+                this.alertTypes = {
+                    donation: { label: 'DONASI', duration: 8000, bgClass: 'bg-donation' },
+                    follow: { label: 'FOLLOW BARU', duration: 5000, bgClass: 'bg-follow' },
+                    subscribe: { label: 'SUBSCRIBER BARU', duration: 6000, bgClass: 'bg-subscribe' },
+                    superchat: { label: 'SUPERCHAT', duration: 9000, bgClass: 'bg-superchat' },
+                    tiktok_comment: { label: 'TIKTOK COMMENT', duration: 4000, bgClass: 'bg-tiktok' },
+                    tiktok_gift: { label: 'TIKTOK GIFT', duration: 6000, bgClass: 'bg-tiktok' }
+                };
+
+                this.initializeSocket();
+                this.setupEventListeners();
+
+                console.log('🎥 OBS Alert Overlay initialized - Clean version (no shadows/borders)');
+            }
+
+            initializeSocket() {
+                try {
+                    this.socket = io({
+                        transports: ['websocket', 'polling'],
+                        timeout: 5000,
+                        forceNew: true
+                    });
+
+                    this.socket.on('connect', () => {
+                        console.log('🔌 Connected to server');
+                        this.isConnected = true;
+
+                        this.socket.emit('identify', {
+                            type: 'obs',
+                            userAgent: navigator.userAgent,
+                            timestamp: Date.now()
+                        });
+                    });
+
+                    this.socket.on('disconnect', () => {
+                        console.log('❌ Disconnected from server');
+                        this.isConnected = false;
+                    });
+
+                    this.socket.on('connection-confirmed', (data) => {
+                        console.log('✅ OBS Connection confirmed:', data);
+                    });
+
+                    this.socket.on('show-alert', (alertData) => {
+                        console.log('🚨 Alert received:', alertData);
+                        this.handleAlert(alertData);
+                    });
+
+                    this.socket.on('connect_error', (error) => {
+                        console.error('❌ Connection failed:', error);
+                    });
+
+                } catch (error) {
+                    console.error('❌ Socket initialization error:', error);
+                }
+            }
+
+            handleAlert(alertData) {
+                try {
+                    if (alertData.type === 'clear') {
+                        this.clearAlert();
+                        return;
+                    }
+
+                    if (!alertData || !alertData.type || !alertData.data) {
+                        console.error('❌ Invalid alert data:', alertData);
+                        return;
+                    }
+
+                    if (this.currentAlert) {
+                        this.alertQueue.push(alertData);
+                        console.log('📋 Alert queued. Queue length:', this.alertQueue.length);
+                        return;
+                    }
+
+                    this.showAlert(alertData);
+
+                } catch (error) {
+                    console.error('❌ Error handling alert:', error);
+                }
+            }
+
+            showAlert(alertData) {
+                try {
+                    this.currentAlert = alertData;
+                    const alertConfig = this.alertTypes[alertData.type] || this.alertTypes.donation;
+
+                    // Update content
+                    this.elements.alertType.textContent = alertConfig.label;
+                    this.elements.donorName.textContent = alertData.data.name || 'Anonymous';
+                    this.elements.donationAmount.textContent = alertData.data.amount || '';
+                    this.elements.donationMessage.textContent = alertData.data.message || '';
+
+                    // Update platform badge
+                    const platform = alertData.data.platform || alertData.data.source || 'API';
+                    this.elements.platformBadge.textContent = platform.toUpperCase();
+
+                    // Reset classes and apply new background - NO shadows/borders
+                    this.elements.alertContainer.className = `alert-container fixed top-4 right-4 w-96 min-h-32 ${alertConfig.bgClass} rounded-2xl z-50 block slide-in`;
+
+                    // Play sound
+                    this.playNotificationSound(alertData.type);
+
+                    // Auto-hide
+                    this.alertTimeout = setTimeout(() => {
+                        this.hideAlert();
+                    }, alertConfig.duration);
+
+                    console.log(`🚨 Showing ${alertData.type} alert for ${alertConfig.duration}ms`);
+
+                } catch (error) {
+                    console.error('❌ Error showing alert:', error);
+                    this.hideAlert();
+                }
+            }
+
+            hideAlert() {
+                try {
+                    if (this.alertTimeout) {
+                        clearTimeout(this.alertTimeout);
+                        this.alertTimeout = null;
+                    }
+
+                    // Add slide out animation
+                    this.elements.alertContainer.classList.remove('slide-in');
+                    this.elements.alertContainer.classList.add('slide-out');
+
+                    // Hide after animation
+                    setTimeout(() => {
+                        this.elements.alertContainer.classList.add('hidden');
+                        this.elements.alertContainer.classList.remove('slide-out');
+                        this.currentAlert = null;
+
+                        // Show next alert
+                        if (this.alertQueue.length > 0) {
+                            const nextAlert = this.alertQueue.shift();
+                            setTimeout(() => {
+                                this.showAlert(nextAlert);
+                            }, 500);
+                        }
+                    }, 300);
+
+                } catch (error) {
+                    console.error('❌ Error hiding alert:', error);
+                }
+            }
+
+            clearAlert() {
+                try {
+                    if (this.alertTimeout) {
+                        clearTimeout(this.alertTimeout);
+                        this.alertTimeout = null;
+                    }
+
+                    this.elements.alertContainer.classList.add('hidden');
+                    this.currentAlert = null;
+                    this.alertQueue = [];
+
+                    console.log('🧹 All alerts cleared');
+
+                } catch (error) {
+                    console.error('❌ Error clearing alerts:', error);
+                }
+            }
+
+            playNotificationSound(alertType) {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    const soundConfig = {
+                        donation: { frequency: 800, duration: 0.3 },
+                        follow: { frequency: 600, duration: 0.2 },
+                        subscribe: { frequency: 1000, duration: 0.4 },
+                        superchat: { frequency: 900, duration: 0.5 },
+                        tiktok_comment: { frequency: 500, duration: 0.15 },
+                        tiktok_gift: { frequency: 700, duration: 0.25 }
+                    };
+
+                    const config = soundConfig[alertType] || soundConfig.donation;
+
+                    oscillator.frequency.setValueAtTime(config.frequency, audioContext.currentTime);
+                    oscillator.type = 'sine';
+
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + config.duration);
+
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + config.duration);
+
+                } catch (error) {
+                    console.log('🔇 Sound not available:', error.message);
+                }
+            }
+
+            setupEventListeners() {
+                // Test keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.altKey) {
+                        switch (e.key) {
+                            case '1':
+                                this.testAlert('donation');
+                                break;
+                            case '2':
+                                this.testAlert('follow');
+                                break;
+                            case '3':
+                                this.testAlert('tiktok_comment');
+                                break;
+                            case 'c':
+                                this.clearAlert();
+                                break;
+                        }
+                    }
+                });
+
+                // Handle visibility changes
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && !this.isConnected) {
+                        console.log('🔄 Reconnecting...');
+                        this.initializeSocket();
+                    }
+                });
+            }
+
+            testAlert(type) {
+                const testAlerts = {
+                    donation: {
+                        type: 'donation',
+                        data: {
+                            name: 'Test Donor',
+                            amount: 'Rp 100,000',
+                            message: 'Test donation alert! Terima kasih banyak!',
+                            source: 'test'
+                        }
+                    },
+                    follow: {
+                        type: 'follow',
+                        data: {
+                            name: 'New Follower',
+                            amount: 'Follow',
+                            message: 'Terima kasih sudah follow!',
+                            source: 'test'
+                        }
+                    },
+                    tiktok_comment: {
+                        type: 'tiktok_comment',
+                        data: {
+                            name: '@test_user',
+                            amount: 'TikTok Comment',
+                            message: 'Halo dari TikTok Live! 🔥',
+                            platform: 'TikTok',
+                            source: 'test'
+                        }
+                    }
+                };
+
+                if (testAlerts[type]) {
+                    this.handleAlert(testAlerts[type]);
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.obsOverlay = new OBSAlertOverlay();
+        });
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('❌ Global error:', e.error);
+        });
+
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>
