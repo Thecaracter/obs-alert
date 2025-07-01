@@ -1,49 +1,32 @@
-name: obs
+version: '3'
 services:
     donation-alert:
-        cpu_shares: 90
-        command:
-            - sh
-            - -c
-            - npm install && node server.js
         container_name: donation-alert
+        image: node:18-alpine
+        working_dir: /app
+        command: >
+            sh -c "apk add --no-cache python3 make g++ &&
+                npm install &&
+                node server.js"
+        ports:
+            - "2005:3000"
+        volumes:
+            - /media/devmon/sda2-ata-ST500VT000-1DK14/Hosting/obs:/app
+        restart: unless-stopped
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "5"
         deploy:
             resources:
                 limits:
                     memory: "2030043136"
+        cpu_shares: 90
         hostname: donation-alert
-        image: node:18-alpine
-        logging:
-            driver: json-file
-            options:
-                max-file: "5"
-                max-size: 10m
         networks:
-            default: null
-        ports:
-            - mode: ingress
-              target: 3000
-              published: "2005"
-              protocol: tcp
-        restart: unless-stopped
-        volumes:
-            - type: bind
-              source: /media/devmon/sda2-ata-ST500VT000-1DK14/Hosting/obs
-              target: /app
-              bind:
-                create_host_path: true
-        working_dir: /app
+            - obs_default
+
 networks:
-    default:
+    obs_default:
         name: obs_default
-x-casaos:
-    author: self
-    category: self
-    hostname: ""
-    icon: ""
-    index: /
-    is_uncontrolled: false
-    port_map: "2005"
-    scheme: http
-    title:
-        custom: donation-alert
