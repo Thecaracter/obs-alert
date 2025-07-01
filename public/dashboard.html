@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,12 +27,12 @@
         }
 
         .header {
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
@@ -80,12 +81,12 @@
         }
 
         .card {
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .card h2 {
@@ -209,7 +210,7 @@
             background: white;
             margin-bottom: 8px;
             border-radius: 0 8px 8px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .activity-item.tiktok_comment {
@@ -305,7 +306,7 @@
             border-radius: 8px;
             color: white;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transform: translateX(400px);
             transition: transform 0.3s;
             z-index: 1000;
@@ -353,6 +354,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -392,7 +394,8 @@
                 </div>
                 <div class="form-group">
                     <label for="donorMessage">Pesan:</label>
-                    <textarea id="donorMessage" rows="3" placeholder="Pesan terima kasih...">Terima kasih untuk support nya!</textarea>
+                    <textarea id="donorMessage" rows="3"
+                        placeholder="Pesan terima kasih...">Terima kasih untuk support nya!</textarea>
                 </div>
                 <div class="button-group">
                     <button class="btn" onclick="triggerAlert()">🚨 Trigger Alert</button>
@@ -405,13 +408,13 @@
                 <h2>🎵 TikTok Live</h2>
                 <div class="form-group">
                     <label for="tiktokUsername">Username TikTok:</label>
-                    <input type="text" id="tiktokUsername" placeholder="username (tanpa @)" value="prysngrchrd">
+                    <input type="text" id="tiktokUsername" placeholder="username (tanpa @)" value="coding.in_">
                 </div>
                 <div class="button-group">
                     <button class="btn tiktok" onclick="connectTikTok()">🔗 Connect</button>
                     <button class="btn danger" onclick="disconnectTikTok()">❌ Disconnect</button>
                 </div>
-                
+
                 <div class="tiktok-connections" id="tiktokConnections">
                     <!-- TikTok connections will be displayed here -->
                 </div>
@@ -510,9 +513,9 @@
                         console.log('🔌 Connected to server');
                         this.isConnected = true;
                         this.updateServerStatus('connected', '✅ Connected');
-                        
+
                         // Identify as dashboard client
-                        this.socket.emit('identify', { 
+                        this.socket.emit('identify', {
                             type: 'dashboard',
                             userAgent: navigator.userAgent,
                             timestamp: Date.now()
@@ -599,9 +602,9 @@
             updateStats(stats) {
                 if (stats) {
                     this.stats.obsConnections = stats.obsConnections || 0;
-                    
+
                     document.getElementById('obsConnections').textContent = this.stats.obsConnections;
-                    
+
                     const obsStatus = document.getElementById('obsStatus');
                     if (this.stats.obsConnections > 0) {
                         obsStatus.textContent = `OBS: ${this.stats.obsConnections} connected`;
@@ -617,7 +620,7 @@
                 if (stats) {
                     const tiktokStatus = document.getElementById('tiktokStatus');
                     const activeConnections = stats.activeConnections || 0;
-                    
+
                     if (activeConnections > 0) {
                         tiktokStatus.textContent = `TikTok: ${activeConnections} active`;
                         tiktokStatus.className = 'status-item connected';
@@ -625,7 +628,7 @@
                         tiktokStatus.textContent = 'TikTok: Disconnected';
                         tiktokStatus.className = 'status-item disconnected';
                     }
-                    
+
                     document.getElementById('totalTikTok').textContent = stats.totalCommentsReceived || 0;
                 }
             }
@@ -645,7 +648,7 @@
                 const timeString = now.toLocaleTimeString('id-ID');
 
                 let contentHtml = '';
-                
+
                 if (activity.type === 'tiktok_comment') {
                     contentHtml = `
                         <div class="activity-time">${timeString}</div>
@@ -687,30 +690,30 @@
                 const activityFeed = document.getElementById('activityFeed');
                 const activityItem = document.createElement('div');
                 activityItem.className = `activity-item ${type}`;
-                
+
                 const now = new Date();
                 const timeString = now.toLocaleTimeString('id-ID');
-                
+
                 activityItem.innerHTML = `
                     <div class="activity-time">${timeString}</div>
                     <div class="activity-content">${content}</div>
                     ${message ? `<div class="activity-message">${message}</div>` : ''}
                 `;
-                
+
                 activityFeed.insertBefore(activityItem, activityFeed.firstChild);
-                
+
                 // Keep only last 50 activities
                 while (activityFeed.children.length > 50) {
                     activityFeed.removeChild(activityFeed.lastChild);
                 }
-                
+
                 // Update counters
                 this.activityCount++;
                 if (type === 'donation' || type.includes('donation')) {
                     this.stats.totalDonations++;
                     document.getElementById('totalDonations').textContent = this.stats.totalDonations;
                 }
-                
+
                 this.stats.totalAlerts++;
                 document.getElementById('totalAlerts').textContent = this.stats.totalAlerts;
             }
@@ -720,7 +723,7 @@
                 notification.textContent = message;
                 notification.className = `notification ${type}`;
                 notification.classList.add('show');
-                
+
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 3000);
@@ -797,7 +800,7 @@
 
         function connectTikTok() {
             const username = document.getElementById('tiktokUsername').value.trim();
-            
+
             if (!username) {
                 dashboard.showNotification('Username TikTok harus diisi!', 'error');
                 return;
@@ -813,7 +816,7 @@
 
         function disconnectTikTok() {
             const username = document.getElementById('tiktokUsername').value.trim();
-            
+
             if (!username) {
                 dashboard.showNotification('Username TikTok harus diisi!', 'error');
                 return;
@@ -864,10 +867,10 @@
         // Initialize dashboard when page loads
         document.addEventListener('DOMContentLoaded', () => {
             window.dashboard = new AlertDashboard();
-            
+
             console.log('🎛️ Alert Dashboard initialized');
             console.log('🔌 Connecting to server...');
-            
+
             // Add initial activity
             setTimeout(() => {
                 dashboard.addActivity('system', 'Dashboard started', 'Ready to manage alerts');
@@ -895,7 +898,7 @@
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
+                switch (e.key) {
                     case '1':
                         e.preventDefault();
                         testDonation();
@@ -922,4 +925,5 @@
         });
     </script>
 </body>
+
 </html>
