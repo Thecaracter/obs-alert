@@ -1,49 +1,121 @@
 <!DOCTYPE html>
-<html lang="id" class="bg-transparent">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBS Alert Overlay with TikTok Comments</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>OBS Alert Overlay</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <style>
-        /* Force transparency untuk OBS */
+        /* COMPLETE TRANSPARENCY FOR OBS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: none !important;
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+
         html,
         body {
             background: transparent !important;
-            background-color: transparent !important;
-            background-image: none !important;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-
-        html {
-            background: rgba(0, 0, 0, 0) !important;
-        }
-
-        body {
-            background: rgba(0, 0, 0, 0) !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             width: 100vw;
             height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Remove any default styling */
-        *,
-        *::before,
-        *::after {
-            background-color: transparent !important;
+        /* ONLY SPECIFIC ELEMENTS GET BACKGROUNDS */
+        .alert-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         }
 
-        /* Except alert container and comment containers */
-        .alert-bg,
-        .comment-bg {
-            background-color: initial !important;
+        .alert-box.donation {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         }
 
-        /* Alert animations */
+        .alert-box.follow {
+            background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%) !important;
+        }
+
+        .alert-box.subscribe {
+            background: linear-gradient(135deg, #FF5722 0%, #FF8A65 100%) !important;
+        }
+
+        .alert-box.superchat {
+            background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%) !important;
+        }
+
+        .alert-box.tiktok {
+            background: linear-gradient(135deg, #ff0050 0%, #ff4081 100%) !important;
+        }
+
+        .alert-header {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .alert-badge {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .comment-bubble {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-1 {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-2 {
+            background: linear-gradient(135deg, rgba(34, 193, 195, 0.9) 0%, rgba(253, 187, 45, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-3 {
+            background: linear-gradient(135deg, rgba(131, 58, 180, 0.9) 0%, rgba(253, 29, 29, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-4 {
+            background: linear-gradient(135deg, rgba(43, 88, 118, 0.9) 0%, rgba(78, 67, 118, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-5 {
+            background: linear-gradient(135deg, rgba(240, 152, 25, 0.9) 0%, rgba(237, 117, 97, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-6 {
+            background: linear-gradient(135deg, rgba(56, 239, 125, 0.9) 0%, rgba(17, 153, 142, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-7 {
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.9) 0%, rgba(250, 208, 196, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.color-8 {
+            background: linear-gradient(135deg, rgba(72, 85, 99, 0.9) 0%, rgba(41, 50, 60, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.gift {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.9) 0%, rgba(255, 152, 0, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.follow {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.9) 0%, rgba(30, 136, 229, 0.9) 100%) !important;
+        }
+
+        .comment-bubble.tiktok {
+            background: linear-gradient(135deg, rgba(255, 0, 80, 0.9) 0%, rgba(255, 64, 129, 0.9) 100%) !important;
+        }
+
+        .platform-badge {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .gift-info {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* ANIMATIONS */
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -68,7 +140,6 @@
             }
         }
 
-        /* Comment animations */
         @keyframes slideInLeft {
             from {
                 transform: translateX(-100%);
@@ -93,117 +164,115 @@
             }
         }
 
-        .slide-in {
-            animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* ALERT STYLING */
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            min-height: 96px;
+            border-radius: 12px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.5s ease-out;
+            display: none;
         }
 
-        .slide-out {
-            animation: slideOutRight 0.3s ease-in-out;
+        .alert-container.show {
+            display: block;
         }
 
-        .slide-in-left {
-            animation: slideInLeft 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        .alert-container.hide {
+            animation: slideOutRight 0.3s ease-in;
         }
 
-        .slide-out-left {
-            animation: slideOutLeft 0.3s ease-in-out;
+        .alert-header {
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Alert type gradients */
-        .bg-donation {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        .alert-type {
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .bg-follow {
-            background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%) !important;
+        .alert-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
         }
 
-        .bg-subscribe {
-            background: linear-gradient(135deg, #FF5722 0%, #FF8A65 100%) !important;
+        .alert-body {
+            padding: 16px;
+            color: white;
         }
 
-        .bg-superchat {
-            background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%) !important;
+        .donor-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            word-break: break-word;
         }
 
-        .bg-tiktok {
-            background: linear-gradient(135deg, #ff0050 0%, #ff4081 100%) !important;
+        .donation-amount {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 8px;
         }
 
-        /* Comment bubble gradients - Colorful */
+        .donation-message {
+            font-size: 13px;
+            line-height: 1.4;
+            font-style: italic;
+            opacity: 0.95;
+            max-height: 48px;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        /* COMMENTS STYLING */
+        .comments-container {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            width: 380px;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            z-index: 999;
+        }
+
+        .comment-item {
+            animation: slideInLeft 0.5s ease-out;
+            max-width: 100%;
+        }
+
+        .comment-item.fade-out {
+            animation: slideOutLeft 0.3s ease-in;
+        }
+
         .comment-bubble {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%) !important;
             border-radius: 20px;
             padding: 12px 16px;
-            margin-bottom: 4px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
         }
 
-        /* Colorful comment styling - Multiple colors */
-        .comment-tiktok .comment-bubble {
-            background: linear-gradient(135deg, rgba(255, 0, 80, 0.9) 0%, rgba(255, 64, 129, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-1 .comment-bubble {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-2 .comment-bubble {
-            background: linear-gradient(135deg, rgba(34, 193, 195, 0.9) 0%, rgba(253, 187, 45, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-3 .comment-bubble {
-            background: linear-gradient(135deg, rgba(131, 58, 180, 0.9) 0%, rgba(253, 29, 29, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-4 .comment-bubble {
-            background: linear-gradient(135deg, rgba(43, 88, 118, 0.9) 0%, rgba(78, 67, 118, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-5 .comment-bubble {
-            background: linear-gradient(135deg, rgba(240, 152, 25, 0.9) 0%, rgba(237, 117, 97, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-6 .comment-bubble {
-            background: linear-gradient(135deg, rgba(56, 239, 125, 0.9) 0%, rgba(17, 153, 142, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-7 .comment-bubble {
-            background: linear-gradient(135deg, rgba(255, 154, 158, 0.9) 0%, rgba(250, 208, 196, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-color-8 .comment-bubble {
-            background: linear-gradient(135deg, rgba(72, 85, 99, 0.9) 0%, rgba(41, 50, 60, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .comment-gift .comment-bubble {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.9) 0%, rgba(255, 152, 0, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
-        }
-
-        .comment-follow .comment-bubble {
-            background: linear-gradient(135deg, rgba(33, 150, 243, 0.9) 0%, rgba(30, 136, 229, 0.9) 100%) !important;
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
-        }
-
-        /* Text styling */
         .comment-username {
             font-weight: bold;
             font-size: 14px;
-            color: #ffffff;
+            color: white;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
             margin-bottom: 4px;
             display: flex;
@@ -213,7 +282,7 @@
 
         .comment-text {
             font-size: 16px;
-            color: #ffffff;
+            color: white;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
             line-height: 1.4;
             word-break: break-word;
@@ -221,8 +290,7 @@
 
         .platform-badge {
             font-size: 11px;
-            background: rgba(255, 255, 255, 0.2) !important;
-            color: #ffffff;
+            color: white;
             padding: 2px 8px;
             border-radius: 10px;
             font-weight: bold;
@@ -230,11 +298,10 @@
         }
 
         .gift-info {
-            background: rgba(255, 255, 255, 0.2) !important;
             padding: 6px 10px;
             border-radius: 12px;
             font-size: 13px;
-            color: #ffffff;
+            color: white;
             font-weight: bold;
             margin-top: 6px;
             text-align: center;
@@ -245,79 +312,18 @@
             margin-right: 4px;
         }
 
-        /* Comments container - Fixed positioning for OBS */
-        .comments-container {
-            position: absolute;
-            left: 20px;
-            bottom: 20px;
-            width: 380px;
-            max-height: 400px;
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 8px;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .comment-item {
-            animation: slideInLeft 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            max-width: 100%;
-            word-wrap: break-word;
-        }
-
-        .comment-item.fade-out {
-            animation: slideOutLeft 0.3s ease-in-out;
-        }
-
-        /* Status indicators */
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7) !important;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1001;
-            backdrop-filter: blur(5px);
-        }
-
-        .connection-status.connected {
-            background: rgba(76, 175, 80, 0.8) !important;
-        }
-
-        .connection-status.failed {
-            background: rgba(244, 67, 54, 0.8) !important;
-        }
-
-        .comment-counter {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7) !important;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1001;
-            backdrop-filter: blur(5px);
-        }
-
-        /* Hide by default */
         .hidden {
             display: none !important;
         }
 
-        /* Hide scrollbars */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Responsive adjustments */
+        /* RESPONSIVE */
         @media (max-width: 1080px) {
+            .alert-container {
+                width: 300px;
+                top: 15px;
+                right: 15px;
+            }
+
             .comments-container {
                 width: 350px;
                 left: 15px;
@@ -326,6 +332,12 @@
         }
 
         @media (max-width: 720px) {
+            .alert-container {
+                width: 280px;
+                top: 10px;
+                right: 10px;
+            }
+
             .comments-container {
                 width: 300px;
                 left: 10px;
@@ -345,73 +357,60 @@
 
 <body>
     <!-- Alert Container -->
-    <div id="alertContainer" class="alert-bg fixed top-4 right-4 w-80 min-h-24 bg-donation rounded-xl z-50 hidden">
-        <!-- Alert Header -->
-        <div class="alert-bg bg-white/15 px-4 py-2 rounded-t-xl flex justify-between items-center">
-            <span id="alertType" class="text-xs font-bold text-white/90 uppercase tracking-wider">DONASI</span>
-            <span id="platformBadge"
-                class="alert-bg bg-white/20 px-2 py-1 rounded-lg text-xs font-bold text-white">API</span>
+    <div id="alertContainer" class="alert-container">
+        <div class="alert-header">
+            <span id="alertType" class="alert-type">DONASI</span>
+            <span id="platformBadge" class="alert-badge">API</span>
         </div>
-
-        <!-- Alert Body -->
-        <div class="alert-bg p-3 text-white">
-            <div id="donorName" class="text-lg font-bold mb-1 break-words">Nama Donor</div>
-            <div id="donationAmount" class="text-xl font-bold text-yellow-400 mb-2">Rp 50,000</div>
-            <div id="donationMessage"
-                class="text-xs leading-relaxed text-white/95 italic max-h-12 overflow-hidden break-words">
-                Terima kasih untuk support nya!
-            </div>
+        <div class="alert-body">
+            <div id="donorName" class="donor-name">Nama Donor</div>
+            <div id="donationAmount" class="donation-amount">Rp 50,000</div>
+            <div id="donationMessage" class="donation-message">Terima kasih untuk support nya!</div>
         </div>
     </div>
 
     <!-- Comments Container -->
     <div id="commentsContainer" class="comments-container">
-        <!-- Comments will be inserted here dynamically -->
+        <!-- Comments will be inserted here -->
     </div>
 
     <script>
-        class OBSCombinedOverlay {
+        class OBSOverlay {
             constructor() {
                 this.socket = null;
                 this.isConnected = false;
-
-                // Alert properties
                 this.currentAlert = null;
                 this.alertQueue = [];
                 this.alertTimeout = null;
-
-                // Comment properties
                 this.comments = [];
                 this.commentCount = 0;
-                this.maxComments = 5; // Max 5 comments only
-                this.commentDuration = 30000; // 30 seconds duration
+                this.maxComments = 5;
+                this.commentDuration = 30000;
                 this.colorIndex = 0;
 
                 this.elements = {
-                    // Alert elements
                     alertContainer: document.getElementById('alertContainer'),
                     alertType: document.getElementById('alertType'),
                     platformBadge: document.getElementById('platformBadge'),
                     donorName: document.getElementById('donorName'),
                     donationAmount: document.getElementById('donationAmount'),
                     donationMessage: document.getElementById('donationMessage'),
-                    // Comment elements
                     commentsContainer: document.getElementById('commentsContainer')
                 };
 
                 this.alertTypes = {
-                    donation: { label: 'DONASI', duration: 8000, bgClass: 'bg-donation' },
-                    follow: { label: 'FOLLOW BARU', duration: 5000, bgClass: 'bg-follow' },
-                    subscribe: { label: 'SUBSCRIBER BARU', duration: 6000, bgClass: 'bg-subscribe' },
-                    superchat: { label: 'SUPERCHAT', duration: 9000, bgClass: 'bg-superchat' },
-                    tiktok_comment: { label: 'TIKTOK COMMENT', duration: 4000, bgClass: 'bg-tiktok' },
-                    tiktok_gift: { label: 'TIKTOK GIFT', duration: 6000, bgClass: 'bg-tiktok' }
+                    donation: { label: 'DONASI', duration: 8000, class: 'donation' },
+                    follow: { label: 'FOLLOW BARU', duration: 5000, class: 'follow' },
+                    subscribe: { label: 'SUBSCRIBER BARU', duration: 6000, class: 'subscribe' },
+                    superchat: { label: 'SUPERCHAT', duration: 9000, class: 'superchat' },
+                    tiktok_comment: { label: 'TIKTOK COMMENT', duration: 4000, class: 'tiktok' },
+                    tiktok_gift: { label: 'TIKTOK GIFT', duration: 6000, class: 'tiktok' }
                 };
 
                 this.initializeSocket();
                 this.setupEventListeners();
 
-                console.log('🎥 OBS Combined Overlay initialized - Alerts + Comments');
+                console.log('🎥 OBS Overlay initialized');
             }
 
             initializeSocket() {
@@ -428,7 +427,7 @@
 
                         this.socket.emit('identify', {
                             type: 'obs',
-                            userAgent: navigator.userAgent + ' - Combined Overlay',
+                            userAgent: navigator.userAgent + ' - OBS Overlay',
                             timestamp: Date.now()
                         });
                     });
@@ -439,18 +438,16 @@
                     });
 
                     this.socket.on('connection-confirmed', (data) => {
-                        console.log('✅ Combined overlay connection confirmed:', data);
+                        console.log('✅ OBS overlay connection confirmed:', data);
                     });
 
-                    // Alert events
                     this.socket.on('show-alert', (alertData) => {
                         console.log('🚨 Alert received:', alertData);
                         this.handleAlert(alertData);
                     });
 
-                    // Comment events - ONLY listen to one event to prevent duplicates
                     this.socket.on('tiktok-activity', (activity) => {
-                        console.log('TikTok activity received:', activity);
+                        console.log('💬 TikTok activity received:', activity);
                         this.handleComment(activity);
                     });
 
@@ -460,11 +457,9 @@
 
                 } catch (error) {
                     console.error('❌ Socket initialization error:', error);
-                    this.updateConnectionStatus('failed', '❌ Socket Error');
                 }
             }
 
-            // Alert Methods
             handleAlert(alertData) {
                 try {
                     if (alertData.type === 'clear') {
@@ -505,8 +500,8 @@
                     const platform = alertData.data.platform || alertData.data.source || 'API';
                     this.elements.platformBadge.textContent = platform.toUpperCase();
 
-                    // Reset classes and apply new background
-                    this.elements.alertContainer.className = `alert-bg fixed top-4 right-4 w-80 min-h-24 ${alertConfig.bgClass} rounded-xl z-50 block slide-in`;
+                    // Set alert box class and show
+                    this.elements.alertContainer.className = `alert-container alert-box ${alertConfig.class} show`;
 
                     // Play sound
                     this.playNotificationSound(alertData.type);
@@ -531,17 +526,12 @@
                         this.alertTimeout = null;
                     }
 
-                    // Add slide out animation
-                    this.elements.alertContainer.classList.remove('slide-in');
-                    this.elements.alertContainer.classList.add('slide-out');
+                    this.elements.alertContainer.classList.add('hide');
 
-                    // Hide after animation
                     setTimeout(() => {
-                        this.elements.alertContainer.classList.add('hidden');
-                        this.elements.alertContainer.classList.remove('slide-out');
+                        this.elements.alertContainer.classList.remove('show', 'hide');
                         this.currentAlert = null;
 
-                        // Show next alert
                         if (this.alertQueue.length > 0) {
                             const nextAlert = this.alertQueue.shift();
                             setTimeout(() => {
@@ -562,7 +552,7 @@
                         this.alertTimeout = null;
                     }
 
-                    this.elements.alertContainer.classList.add('hidden');
+                    this.elements.alertContainer.classList.remove('show');
                     this.currentAlert = null;
                     this.alertQueue = [];
 
@@ -573,7 +563,6 @@
                 }
             }
 
-            // Comment Methods
             handleComment(data) {
                 try {
                     if (!data || !data.type || !data.data) {
@@ -601,22 +590,16 @@
             }
 
             addComment(comment) {
-                // Add to comments array
                 this.comments.unshift(comment);
                 this.commentCount++;
 
-                // Create comment element
                 const commentElement = this.createCommentElement(comment);
-
-                // Add to container
                 this.elements.commentsContainer.appendChild(commentElement);
 
-                // Auto-remove comment after duration (30 seconds)
                 setTimeout(() => {
                     this.removeComment(comment.id);
                 }, this.commentDuration);
 
-                // Keep only max 5 comments visible
                 this.trimComments();
 
                 console.log(`💬 Comment added: ${comment.username}: ${comment.message}`);
@@ -624,15 +607,14 @@
 
             createCommentElement(comment) {
                 const commentDiv = document.createElement('div');
-
                 let className = 'comment-item';
                 let typeIcon = '💬';
                 let extraInfo = '';
+                let bubbleClass = 'comment-bubble';
 
-                // Set icons and extra info based on type
                 if (comment.type === 'tiktok_gift') {
                     typeIcon = '🎁';
-                    className += ' comment-gift';
+                    bubbleClass += ' gift';
                     if (comment.giftType && comment.giftValue) {
                         extraInfo = `<div class="gift-info">🎁 ${comment.giftType} (${comment.giftValue} coins)</div>`;
                     } else if (comment.amount) {
@@ -640,21 +622,20 @@
                     }
                 } else if (comment.type === 'follow') {
                     typeIcon = '👥';
-                    className += ' comment-follow';
+                    bubbleClass += ' follow';
                     extraInfo = `<div class="gift-info">👥 New Follower!</div>`;
                 } else if (comment.type === 'tiktok_comment') {
                     typeIcon = '💬';
-                    // Assign random colorful class for regular comments
                     const colorNumber = (this.colorIndex % 8) + 1;
-                    className += ` comment-color-${colorNumber}`;
-                    this.colorIndex++; // Cycle through colors
+                    bubbleClass += ` color-${colorNumber}`;
+                    this.colorIndex++;
                 }
 
                 commentDiv.className = className;
                 commentDiv.id = `comment-${comment.id}`;
 
                 commentDiv.innerHTML = `
-                    <div class="comment-bubble comment-bg">
+                    <div class="${bubbleClass}">
                         <div class="comment-username">
                             <span class="emoji">${typeIcon}</span>
                             <span>${comment.username}</span>
@@ -671,23 +652,19 @@
             removeComment(commentId) {
                 const commentElement = document.getElementById(`comment-${commentId}`);
                 if (commentElement) {
-                    // Add fade out animation
                     commentElement.classList.add('fade-out');
 
-                    // Remove from DOM after animation
                     setTimeout(() => {
                         if (commentElement && commentElement.parentNode) {
                             commentElement.parentNode.removeChild(commentElement);
                         }
                     }, 300);
 
-                    // Remove from comments array
                     this.comments = this.comments.filter(c => c.id !== commentId);
                 }
             }
 
             trimComments() {
-                // Remove oldest comments if we have more than 5
                 while (this.elements.commentsContainer.children.length > this.maxComments) {
                     const oldestComment = this.elements.commentsContainer.lastElementChild;
                     if (oldestComment) {
@@ -701,9 +678,6 @@
                 }
             }
 
-            // Status Methods - Removed to clean up overlay
-
-            // Sound Methods
             playNotificationSound(alertType) {
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -739,7 +713,6 @@
             }
 
             setupEventListeners() {
-                // Keyboard shortcuts for testing
                 document.addEventListener('keydown', (e) => {
                     if (e.altKey) {
                         switch (e.key) {
@@ -766,19 +739,12 @@
                     }
                 });
 
-                // Handle visibility changes
                 document.addEventListener('visibilitychange', () => {
-                    if (document.hidden) {
-                        console.log('📱 Combined overlay hidden');
-                    } else {
-                        console.log('👁️ Combined overlay visible');
-                        if (!this.isConnected) {
-                            this.initializeSocket();
-                        }
+                    if (!document.hidden && !this.isConnected) {
+                        this.initializeSocket();
                     }
                 });
 
-                // Handle window focus
                 window.addEventListener('focus', () => {
                     if (!this.isConnected) {
                         console.log('🔄 Reconnecting...');
@@ -787,7 +753,6 @@
                 });
             }
 
-            // Test Methods
             testAlert(type) {
                 const testAlerts = {
                     donation: {
@@ -878,36 +843,19 @@
                 this.comments = [];
                 console.log('🧹 Comments cleared');
             }
-
-            getStatus() {
-                return {
-                    connected: this.isConnected,
-                    commentsCount: this.comments.length,
-                    totalComments: this.commentCount,
-                    currentAlert: this.currentAlert ? this.currentAlert.type : null,
-                    alertQueue: this.alertQueue.length,
-                    uptime: Date.now() - (window.startTime || Date.now())
-                };
-            }
         }
 
-        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            window.startTime = Date.now();
-            window.obsOverlay = new OBSCombinedOverlay();
+            window.obsOverlay = new OBSOverlay();
 
-            console.log('🎥 OBS Combined Overlay initialized');
-            console.log('⌨️ Test shortcuts:');
-            console.log('   Alt+1: Test Donation | Alt+2: Test Follow | Alt+3: Test Comment');
-            console.log('   Alt+4: Test Gift | Alt+5: Test TikTok Gift Alert | Alt+C: Clear All');
+            console.log('🎥 OBS Overlay ready');
+            console.log('⌨️ Test shortcuts: Alt+1 (Donation) | Alt+2 (Follow) | Alt+3 (Comment) | Alt+4 (Gift) | Alt+C (Clear)');
         });
 
-        // Global error handler
         window.addEventListener('error', (e) => {
             console.error('❌ Global error:', e.error);
         });
 
-        // Prevent context menu
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });

@@ -14,10 +14,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f0b1a 0%, #1a1329 50%, #251d3a 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            color: #333;
+            color: #e8e8f0;
         }
 
         .container {
@@ -27,44 +28,73 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: rgba(18, 16, 35, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 40px rgba(135, 84, 255, 0.15);
+            border: 1px solid rgba(135, 84, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8754ff, #b794ff, #8754ff);
         }
 
         .header h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.2em;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 2.4em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8754ff, #b794ff, #6c5ce7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .header p {
+            color: #a8a8b8;
+            font-size: 1.1em;
+            font-weight: 400;
         }
 
         .status-bar {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .status-item {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            padding: 8px 16px;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            color: #e8e8f0;
+            padding: 12px 20px;
             border-radius: 25px;
             font-size: 0.9em;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(135, 84, 255, 0.2);
+            transition: all 0.3s ease;
         }
 
         .status-item.disconnected {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            border-color: rgba(229, 62, 62, 0.3);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.25);
+        }
+
+        .status-item.connected {
+            background: linear-gradient(135deg, #8754ff, #b794ff);
+            border-color: rgba(135, 84, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(135, 84, 255, 0.35);
         }
 
         .grid {
@@ -81,70 +111,106 @@
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(18, 16, 35, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(135, 84, 255, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(135, 84, 255, 0.3), transparent);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(135, 84, 255, 0.2);
+            border-color: rgba(135, 84, 255, 0.3);
         }
 
         .card h2 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.4em;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 8px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-size: 1.5em;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(135, 84, 255, 0.4);
+            padding-bottom: 12px;
+            background: linear-gradient(135deg, #8754ff, #b794ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e8e8f0;
+            font-size: 0.95em;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 14px 18px;
+            border: 2px solid rgba(135, 84, 255, 0.2);
+            border-radius: 12px;
             font-size: 1em;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(26, 20, 41, 0.6);
+            color: #e8e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #a8a8b8;
         }
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #8754ff;
+            box-shadow: 0 0 0 4px rgba(135, 84, 255, 0.2);
+            background: rgba(26, 20, 41, 0.8);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #8754ff, #b794ff);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: none;
+            letter-spacing: 0.3px;
+            box-shadow: 0 6px 20px rgba(135, 84, 255, 0.3);
+            border: 1px solid rgba(135, 84, 255, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(135, 84, 255, 0.4);
+            background: linear-gradient(135deg, #9965ff, #c4a5ff);
         }
 
         .btn:active {
@@ -152,43 +218,65 @@
         }
 
         .btn.danger {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+            background: linear-gradient(135deg, #e53e3e, #f56565);
+            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.3);
+            border-color: rgba(229, 62, 62, 0.2);
+        }
+
+        .btn.danger:hover {
+            background: linear-gradient(135deg, #f56565, #fc8181);
+            box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
         }
 
         .btn.success {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            background: linear-gradient(135deg, #38a169, #48bb78);
+            box-shadow: 0 6px 20px rgba(56, 161, 105, 0.3);
+            border-color: rgba(56, 161, 105, 0.2);
+        }
+
+        .btn.success:hover {
+            background: linear-gradient(135deg, #48bb78, #68d391);
+            box-shadow: 0 8px 25px rgba(56, 161, 105, 0.4);
         }
 
         .btn.tiktok {
-            background: linear-gradient(135deg, #ff0050, #ff4081);
-            box-shadow: 0 4px 15px rgba(255, 0, 80, 0.3);
+            background: linear-gradient(135deg, #fe2c55, #ff6b9d);
+            box-shadow: 0 6px 20px rgba(254, 44, 85, 0.3);
+            border-color: rgba(254, 44, 85, 0.2);
+        }
+
+        .btn.tiktok:hover {
+            background: linear-gradient(135deg, #ff6b9d, #ff8db9);
+            box-shadow: 0 8px 25px rgba(254, 44, 85, 0.4);
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .tiktok-connections {
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .tiktok-connection {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            background: linear-gradient(135deg, #ff0050, #ff4081);
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(254, 44, 85, 0.9), rgba(255, 107, 157, 0.9));
             color: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 6px 20px rgba(254, 44, 85, 0.25);
+            border: 1px solid rgba(254, 44, 85, 0.3);
         }
 
         .tiktok-connection .username {
             font-weight: bold;
+            font-size: 1.1em;
         }
 
         .tiktok-connection .stats {
@@ -199,117 +287,168 @@
         .activity-feed {
             max-height: 400px;
             overflow-y: auto;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
+            background: rgba(15, 11, 26, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(135, 84, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .activity-feed::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .activity-feed::-webkit-scrollbar-track {
+            background: rgba(26, 20, 41, 0.3);
+            border-radius: 4px;
+        }
+
+        .activity-feed::-webkit-scrollbar-thumb {
+            background: rgba(135, 84, 255, 0.4);
+            border-radius: 4px;
+        }
+
+        .activity-feed::-webkit-scrollbar-thumb:hover {
+            background: rgba(135, 84, 255, 0.6);
         }
 
         .activity-item {
-            padding: 10px;
-            border-left: 4px solid #667eea;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 0 8px 8px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            border-left: 4px solid #8754ff;
+            background: rgba(26, 20, 41, 0.6);
+            margin-bottom: 12px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(135, 84, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(26, 20, 41, 0.8);
+            border-left-color: #b794ff;
         }
 
         .activity-item.tiktok_comment {
-            border-left-color: #ff0050;
-            background: linear-gradient(90deg, rgba(255, 0, 80, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-left-color: #fe2c55;
+            background: linear-gradient(90deg, rgba(254, 44, 85, 0.1) 0%, rgba(26, 20, 41, 0.6) 100%);
         }
 
         .activity-item.tiktok_gift {
             border-left-color: #ff6b35;
-            background: linear-gradient(90deg, rgba(255, 107, 53, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.1) 0%, rgba(26, 20, 41, 0.6) 100%);
         }
 
         .activity-item.donation {
-            border-left-color: #4CAF50;
-            background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-left-color: #38a169;
+            background: linear-gradient(90deg, rgba(56, 161, 105, 0.1) 0%, rgba(26, 20, 41, 0.6) 100%);
         }
 
         .activity-item.follow {
-            border-left-color: #2196F3;
-            background: linear-gradient(90deg, rgba(33, 150, 243, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-left-color: #8754ff;
+            background: linear-gradient(90deg, rgba(135, 84, 255, 0.1) 0%, rgba(26, 20, 41, 0.6) 100%);
+        }
+
+        .activity-item.alert {
+            border-left-color: #b794ff;
+            background: linear-gradient(90deg, rgba(183, 148, 255, 0.1) 0%, rgba(26, 20, 41, 0.6) 100%);
         }
 
         .comment-username {
-            font-weight: bold;
-            color: #ff0050;
+            font-weight: 600;
+            color: #fe2c55;
             margin-right: 8px;
         }
 
         .comment-text {
-            color: #333;
-            line-height: 1.4;
+            color: #e8e8f0;
+            line-height: 1.5;
         }
 
         .gift-info {
-            background: rgba(255, 107, 53, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
+            background: rgba(255, 107, 53, 0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 0.85em;
-            color: #ff6b35;
+            color: #ff8a65;
             font-weight: bold;
-            margin-top: 4px;
+            margin-top: 6px;
             display: inline-block;
+            border: 1px solid rgba(255, 107, 53, 0.3);
         }
 
         .activity-time {
-            font-size: 0.8em;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 0.85em;
+            color: #a8a8b8;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .activity-content {
-            font-weight: bold;
+            font-weight: 600;
+            color: #e8e8f0;
+            font-size: 1.05em;
         }
 
         .activity-message {
             font-style: italic;
-            color: #555;
-            margin-top: 5px;
+            color: #c4c4d0;
+            margin-top: 6px;
+            line-height: 1.4;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
         }
 
         .stat-item {
             text-align: center;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 22px 18px;
+            background: linear-gradient(135deg, rgba(135, 84, 255, 0.8), rgba(183, 148, 255, 0.6));
             color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(135, 84, 255, 0.25);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(135, 84, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 84, 255, 0.35);
+            background: linear-gradient(135deg, rgba(135, 84, 255, 0.9), rgba(183, 148, 255, 0.7));
         }
 
         .stat-number {
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .stat-label {
             font-size: 0.9em;
-            opacity: 0.9;
+            opacity: 0.95;
+            font-weight: 500;
         }
 
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
+            padding: 16px 24px;
+            border-radius: 12px;
             color: white;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transform: translateX(400px);
             transition: transform 0.3s;
             z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .notification.show {
@@ -317,15 +456,18 @@
         }
 
         .notification.success {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.9), rgba(72, 187, 120, 0.9));
+            border-color: rgba(56, 161, 105, 0.3);
         }
 
         .notification.error {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
+            background: linear-gradient(135deg, rgba(229, 62, 62, 0.9), rgba(245, 101, 101, 0.9));
+            border-color: rgba(229, 62, 62, 0.3);
         }
 
         .notification.info {
-            background: linear-gradient(135deg, #2196F3, #1976D2);
+            background: linear-gradient(135deg, rgba(135, 84, 255, 0.9), rgba(183, 148, 255, 0.9));
+            border-color: rgba(135, 84, 255, 0.3);
         }
 
         .full-width {
@@ -334,13 +476,13 @@
 
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .button-group .btn {
             flex: 1;
-            min-width: 120px;
+            min-width: 130px;
         }
 
         @media (max-width: 480px) {
@@ -351,6 +493,42 @@
             .button-group .btn {
                 width: 100%;
             }
+        }
+
+        /* Custom animations */
+        @keyframes phantomGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 6px 20px rgba(135, 84, 255, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 8px 30px rgba(135, 84, 255, 0.5);
+            }
+        }
+
+        .btn:not(:disabled):hover {
+            animation: phantomGlow 2s ease-in-out infinite;
+        }
+
+        /* Scrollbar styling for the entire page */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 11, 26, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8754ff, #b794ff);
+            border-radius: 6px;
+            border: 2px solid rgba(15, 11, 26, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #9965ff, #c4a5ff);
         }
     </style>
 </head>
@@ -372,16 +550,16 @@
         <div class="grid">
             <!-- Manual Alert Trigger -->
             <div class="card">
-                <h2>🚨 Manual Alert</h2>
+                <h2>Manual Alert</h2>
                 <div class="form-group">
                     <label for="alertType">Jenis Alert:</label>
                     <select id="alertType">
-                        <option value="donation">💰 Donation</option>
-                        <option value="follow">👥 Follow</option>
-                        <option value="subscribe">⭐ Subscribe</option>
-                        <option value="superchat">💬 Superchat</option>
-                        <option value="tiktok_comment">🎵 TikTok Comment</option>
-                        <option value="tiktok_gift">🎁 TikTok Gift</option>
+                        <option value="donation">Donation</option>
+                        <option value="follow">Follow</option>
+                        <option value="subscribe">Subscribe</option>
+                        <option value="superchat">Superchat</option>
+                        <option value="tiktok_comment">TikTok Comment</option>
+                        <option value="tiktok_gift">TikTok Gift</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -398,21 +576,21 @@
                         placeholder="Pesan terima kasih...">Terima kasih untuk support nya!</textarea>
                 </div>
                 <div class="button-group">
-                    <button class="btn" onclick="triggerAlert()">🚨 Trigger Alert</button>
-                    <button class="btn danger" onclick="clearAlerts()">🧹 Clear All</button>
+                    <button class="btn" onclick="triggerAlert()">Trigger Alert</button>
+                    <button class="btn danger" onclick="clearAlerts()">Clear All</button>
                 </div>
             </div>
 
             <!-- TikTok Live Control -->
             <div class="card">
-                <h2>🎵 TikTok Live</h2>
+                <h2>TikTok Live</h2>
                 <div class="form-group">
                     <label for="tiktokUsername">Username TikTok:</label>
                     <input type="text" id="tiktokUsername" placeholder="username (tanpa @)" value="coding.in_">
                 </div>
                 <div class="button-group">
-                    <button class="btn tiktok" onclick="connectTikTok()">🔗 Connect</button>
-                    <button class="btn danger" onclick="disconnectTikTok()">❌ Disconnect</button>
+                    <button class="btn tiktok" onclick="connectTikTok()">Connect</button>
+                    <button class="btn danger" onclick="disconnectTikTok()">Disconnect</button>
                 </div>
 
                 <div class="tiktok-connections" id="tiktokConnections">
@@ -512,7 +690,7 @@
                     this.socket.on('connect', () => {
                         console.log('🔌 Connected to server');
                         this.isConnected = true;
-                        this.updateServerStatus('connected', '✅ Connected');
+                        this.updateServerStatus('connected', 'Connected');
 
                         // Identify as dashboard client
                         this.socket.emit('identify', {
@@ -525,7 +703,7 @@
                     this.socket.on('disconnect', () => {
                         console.log('❌ Disconnected from server');
                         this.isConnected = false;
-                        this.updateServerStatus('disconnected', '❌ Disconnected');
+                        this.updateServerStatus('disconnected', 'Disconnected');
                     });
 
                     this.socket.on('connection-confirmed', (data) => {
@@ -583,13 +761,13 @@
 
                     this.socket.on('connect_error', (error) => {
                         console.error('❌ Connection failed:', error);
-                        this.updateServerStatus('disconnected', '❌ Connection failed');
+                        this.updateServerStatus('disconnected', 'Connection failed');
                         this.showNotification('Failed to connect to server', 'error');
                     });
 
                 } catch (error) {
                     console.error('❌ Socket initialization error:', error);
-                    this.updateServerStatus('disconnected', '❌ Socket error');
+                    this.updateServerStatus('disconnected', 'Socket error');
                 }
             }
 
